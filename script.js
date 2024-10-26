@@ -1,29 +1,49 @@
-const container = document.getElementById('container')
-const colors = ['#e74c3c', '#8e44ad', '#3498db', '#e67e22', '#2ecc71']
-const SQUARES = 500
+const smallCups = document.querySelectorAll('.cup-small')
+const liters = document.getElementById('liters')
+const percentage = document.getElementById('percentage')
+const remained = document.getElementById('remained')
 
-for(let i = 0; i < SQUARES; i++) {
-    const square = document.createElement('div')
-    square.classList.add('square')
+updateBigCup()
 
-    square.addEventListener('mouseover', () => setColor(square))
+smallCups.forEach((cup, idx) => {
+    cup.addEventListener('click', () => highlightCups(idx))
+})
 
-    square.addEventListener('mouseout', () => removeColor(square))
+function highlightCups(idx) {
+    if (idx===7 && smallCups[idx].classList.contains("full")) idx--;
+    else if(smallCups[idx].classList.contains('full') && !smallCups[idx].nextElementSibling.classList.contains('full')) {
+        idx--
+    }
 
-    container.appendChild(square)
+    smallCups.forEach((cup, idx2) => {
+        if(idx2 <= idx) {
+            cup.classList.add('full')
+        } else {
+            cup.classList.remove('full')
+        }
+    })
+
+    updateBigCup()
 }
 
-function setColor(element) {
-   const color = getRandomColor()
-   element.style.background = color
-   element.style.boxShadow = `0 0 2px ${color}, 0 0 10px ${color}`
-}
+function updateBigCup() {
+    const fullCups = document.querySelectorAll('.cup-small.full').length
+    const totalCups = smallCups.length
 
-function removeColor(element) {
-   element.style.background = '#1d1d1d'
-   element.style.boxShadow = '0 0 2px #000'
-}
+    if(fullCups === 0) {
+        percentage.style.visibility = 'hidden'
+        percentage.style.height = 0
+    } else {
+        percentage.style.visibility = 'visible'
+        percentage.style.height = `${fullCups / totalCups * 330}px`
+        percentage.innerText = `${fullCups / totalCups * 100}%`
+    }
 
-function getRandomColor() {
-    return colors[Math.floor(Math.random() * colors.length)]
+    if(fullCups === totalCups) {
+        remained.style.visibility = 'hidden'
+        remained.style.height = 0
+    } else {
+        remained.style.visibility = 'visible'
+        liters.innerText = `${2 - (250 * fullCups / 1000)}L`
+    }
 }
